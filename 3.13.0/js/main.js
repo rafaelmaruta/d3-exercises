@@ -22,7 +22,7 @@ const g = svg.append('g')
   .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
 g.append('text')
-  .attr('x', -(canvasHeight / 2))
+  .attr('x', -canvasHeight / 2)
   .attr('y', -70)
   .attr('transform', 'rotate(-90)')
   .attr('text-anchor', 'middle')
@@ -47,7 +47,7 @@ d3.json('data/revenues.json').then(data => {
   const scaleX = d3.scaleBand()
     .domain(categories)
     .range([0, canvasWidth])
-    .padding(0.1)
+    .padding(0.2)
 
   const scaleY = d3.scaleLinear()
     .domain([0, revenueMax])
