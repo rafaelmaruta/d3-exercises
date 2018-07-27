@@ -40,13 +40,16 @@ const yearText = g.append('text')
   .attr('y', canvasHeight - 10)
   .attr('text-anchor', 'end')
 
-const scaleX = d3.scaleLinear()
-  .domain([400, 40000])
+const scaleX = d3.scaleLog()
+  .base(10)
+  .domain([142, 150000])
   .range([0, canvasWidth])
 
 const scaleY = d3.scaleLinear()
   .domain([0, 90])
   .range([canvasHeight, 0])
+
+const continentColor = d3.scaleOrdinal(d3.schemePastel1);
 
 let counter = 0
 
@@ -54,10 +57,12 @@ d3.json('data/data.json').then(data => {
   const maxPopulation = d3.max(data[data.length-1].countries, d => d.population)
 
   const scalePopulation = d3.scaleLinear()
-    .domain([0, maxPopulation])
-    .range([5, 25])
+    .range([25 * Math.PI, 1500 * Math.PI])
+    .domain([2000, maxPopulation]);
 
   const xAxisCall = d3.axisBottom(scaleX)
+    .tickValues([400, 4000, 40000])
+    .tickFormat(d => `$${d}`)
   g.append('g')
     .attr('transform', `translate(0 ,${canvasHeight})`)
     .call(xAxisCall)
@@ -75,6 +80,8 @@ d3.json('data/data.json').then(data => {
       update(counter, data, scalePopulation)
     }
   }, 100)
+
+  update(counter, data, scalePopulation)
 })
 
 const update = (counter, data, scalePopulation) => {
@@ -94,10 +101,10 @@ const update = (counter, data, scalePopulation) => {
   circles.exit().remove()
 
   circles.enter().append('circle')
-    .attr('fill', 'grey')
+    .attr('fill', d => continentColor(d.continent))
       .merge(circles)
-      .transition(20)
-      .attr('cx', d => scaleX(d.income) + scalePopulation(d.population) / 2)
+      .transition(50)
+      .attr('cx', d => scaleX(d.income))
       .attr('cy', d => scaleY(d.life_exp))
-      .attr('r', d => scalePopulation(d.population))
+      .attr('r', d => Math.sqrt(scalePopulation(d.population) / Math.PI))
 }
